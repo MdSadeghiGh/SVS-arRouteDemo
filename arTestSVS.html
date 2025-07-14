@@ -2,72 +2,51 @@
 <html>
   <head>
     <title>AR Route Demo</title>
-    <meta charset="utf-8" />
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.2/aframe/build/aframe-ar.min.js"></script>
     <style>
-      body { margin: 0; overflow: hidden; }
-      canvas { display: block; }
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
     </style>
   </head>
+
   <body>
-    <script type="module">
-      import * as THREE from 'https://cdn.skypack.dev/three@0.152.2';
-      import { ARButton } from 'https://cdn.skypack.dev/three@0.152.2/examples/jsm/webxr/ARButton.js';
+    <a-scene
+      embedded
+      vr-mode-ui="enabled: false"
+      arjs="sourceType: webcam; debugUIEnabled: false;"
+    >
+      <!-- فلش اول -->
+      <a-box
+        position="0 0 0"
+        color="red"
+        depth="1"
+        height="0.2"
+        width="0.2"
+      ></a-box>
 
-      let camera, scene, renderer;
-      let controller;
+      <!-- فلش دوم، به جلو -->
+      <a-box
+        position="0 0 -2"
+        color="blue"
+        depth="1"
+        height="0.2"
+        width="0.2"
+      ></a-box>
 
-      init();
-      animate();
+      <!-- فلش سوم، چرخیده به راست -->
+      <a-box
+        position="2 0 -2"
+        rotation="0 90 0"
+        color="green"
+        depth="1"
+        height="0.2"
+        width="0.2"
+      ></a-box>
 
-      function init() {
-        scene = new THREE.Scene();
-
-        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
-
-        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.xr.enabled = true;
-        document.body.appendChild(renderer.domElement);
-
-        document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures: ['hit-test'] }));
-
-        const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-        light.position.set(0.5, 1, 0.25);
-        scene.add(light);
-
-        controller = renderer.xr.getController(0);
-        controller.addEventListener('select', onSelect);
-        scene.add(controller);
-      }
-
-      function onSelect() {
-        // نقاط مسیر به متر (x, z, rotation)
-        const path = [
-          { x: 0, z: -1, rotation: 0 },
-          { x: 0, z: -20.2, rotation: 0 },
-          { x: 19.2, z: -20.2, rotation: Math.PI / 2 },
-          { x: 22.4, z: -20.2, rotation: Math.PI }
-        ];
-
-        const arrowGeometry = new THREE.ConeGeometry(0.1, 0.3, 16);
-        const arrowMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-
-        path.forEach(point => {
-          const arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
-          arrow.position.set(point.x, 0, point.z); // روی زمین
-          arrow.rotation.x = -Math.PI / 2;         // بخوابونش روی زمین
-          arrow.rotation.z = point.rotation;       // جهت فلش
-          scene.add(arrow);
-        });
-      }
-
-      function animate() {
-        renderer.setAnimationLoop(render);
-      }
-
-      function render() {
-        renderer.render(scene, camera);
-      }
-    </script>
+      <a-camera-static />
+    </a-scene>
   </body>
 </html>
